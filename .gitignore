@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ML/Data
+data/
+*.csv
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+
+# Models
+models/*.pkl
+models/*.joblib
+models/*.h5
+
+# OS
+.DS_Store
+Thumbs.db
+
+# UV
+.uv/
+uv.lock
+
+# Logs
+*.log
