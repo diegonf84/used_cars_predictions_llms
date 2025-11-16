@@ -15,3 +15,8 @@ google-generativeai
 # Backend API
 pydantic
 python-dotenv
+fastapi
+uvicorn[standard]
+
+# Testing
+requests
