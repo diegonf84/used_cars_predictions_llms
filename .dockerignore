@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+.uv/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+notebooks/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data (not needed in container)
+data/
+*.csv
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+tests/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (will be passed at runtime)
+.env
+.env.*
+!.env.example
+
+# Docker files (no need to copy into image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# CI/CD
+.github/

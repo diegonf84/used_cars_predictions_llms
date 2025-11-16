@@ -62,34 +62,73 @@ After submission, the app displays the estimated price range along with an AI-ge
 
 ## Setup
 
-1. Install dependencies:
-```bash
-uv sync
-```
+### Option 1: Docker (Recommended for Quick Start)
 
-2. Set up environment variables (`.env`):
-```bash
-GEMINI_API_KEY=your_api_key_here
-```
+1. **Set up API key** (choose one method):
 
-3. Run the application:
-```bash
-uvicorn backend.app.main:app --reload
-```
+   **Method A - Using system environment variable (simplest):**
+   ```bash
+   export GEMINI_API_KEY=your_api_key_here
+   ```
 
-4. Access the application:
-- **Web Interface**: http://localhost:8000
-- API Documentation: http://localhost:8000/docs
-- Health Check: http://localhost:8000/api/v1/health
+   **Method B - Using .env file (optional):**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your GEMINI_API_KEY
+   ```
 
-5. Run tests:
-```bash
-# Test LLM feature extraction
-python tests/test_llm_extraction.py
+2. **Build and run:**
+   ```bash
+   docker compose build
+   docker compose up -d
+   ```
 
-# Test API endpoints (server must be running)
-python tests/test_api.py
-```
+3. **Access the application:**
+   - **Web Interface**: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+   - Health Check: http://localhost:8000/api/v1/health
+
+4. **View logs:**
+   ```bash
+   docker compose logs -f
+   # Press Ctrl+C to exit logs (container keeps running)
+   ```
+
+5. **Stop the application:**
+   ```bash
+   docker compose down
+   ```
+
+### Option 2: Local Development
+
+1. **Install dependencies:**
+   ```bash
+   uv sync
+   ```
+
+2. **Set up environment variables:**
+   ```bash
+   export GEMINI_API_KEY=your_api_key_here
+   ```
+
+3. **Run the application:**
+   ```bash
+   uvicorn backend.app.main:app --reload
+   ```
+
+4. **Access the application:**
+   - **Web Interface**: http://localhost:8000
+   - API Documentation: http://localhost:8000/docs
+   - Health Check: http://localhost:8000/api/v1/health
+
+5. **Run tests:**
+   ```bash
+   # Test LLM feature extraction
+   python tests/test_llm_extraction.py
+
+   # Test API endpoints (server must be running)
+   python tests/test_api.py
+   ```
 
 ## How It Works
 
@@ -100,6 +139,59 @@ python tests/test_api.py
 5. ML model predicts price with confidence interval
 6. LLM generates friendly summary explaining the estimate and considerations
 7. Results displayed with price range and AI-generated explanation
+
+## Docker Architecture
+
+### Why Docker?
+- ✅ **Reproducible builds**: Exact dependency versions locked via `uv.lock`
+- ✅ **Single command deployment**: `docker-compose up` and you're running
+- ✅ **Future-ready**: Easy to add Redis, PostgreSQL, Nginx when needed
+- ✅ **Production-ready**: Non-root user, health checks, restart policies
+
+### Technical Details
+
+**Multi-stage build:**
+1. **Stage 1 (builder)**: Uses `uv` to install exact locked dependencies
+2. **Stage 2 (runtime)**: Copies only necessary files to slim Python image
+
+**Security:**
+- Runs as non-root user (`appuser`)
+- Minimal attack surface (slim base image)
+- Health check endpoint monitoring
+
+**Flexibility:**
+- Supports both `.env` file and system environment variables
+- Environment variables take precedence (12-factor app pattern)
+
+**Future services** (commented in `docker-compose.yml`):
+- Redis for caching predictions
+- PostgreSQL for analytics/request logging
+- Nginx for reverse proxy + rate limiting
+
+### Docker Commands Reference
+
+```bash
+# Build and start
+docker compose up -d
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# View logs (Ctrl+C to exit, container keeps running)
+docker compose logs -f app
+
+# Check running containers
+docker compose ps
+
+# Stop
+docker compose down
+
+# Stop and remove volumes
+docker compose down -v
+
+# Check health
+curl http://localhost:8000/api/v1/health
+```
 
 ## Using the Application
 
@@ -155,6 +247,6 @@ All requests must include the `"description"` key:
 
 - [x] FastAPI backend with REST endpoints
 - [x] Web frontend interface
-- [ ] Docker deployment setup
-- [ ] Cloud deployment (Railway, Render, or similar)
+- [x] Docker deployment setup
+- [ ] Cloud deployment (Railway, Render, or similar free tier)
 - [ ] Rate limiting and API security

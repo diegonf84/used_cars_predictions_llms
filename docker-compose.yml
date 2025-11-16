@@ -1,0 +1,83 @@
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: car-price-predictor
+    ports:
+      - "8000:8000"
+
+    # Environment variables - supports both methods:
+    # Method 1: Use system env vars (export GEMINI_API_KEY=xxx)
+    # Method 2: Use .env file (cp .env.example .env and edit)
+    # System env vars take precedence over .env file
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+
+    # Restart policy for production
+    restart: unless-stopped
+
+    # Health check (uses HEALTHCHECK from Dockerfile)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Resource limits (optional, uncomment for production)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1.0'
+    #       memory: 1G
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 512M
+
+  # Future services (ready to uncomment when needed):
+
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: car-price-redis
+  #   ports:
+  #     - "6379:6379"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis_data:/data
+
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: car-price-postgres
+  #   environment:
+  #     - POSTGRES_DB=carprice
+  #     - POSTGRES_USER=appuser
+  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: car-price-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #   depends_on:
+  #     - app
+  #   restart: unless-stopped
+
+# Future volumes (uncomment when needed)
+# volumes:
+#   redis_data:
+#   postgres_data:
+
+# Network (optional, all services use default bridge network for now)
+# networks:
+#   app_network:
+#     driver: bridge

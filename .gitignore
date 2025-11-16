@@ -28,8 +28,9 @@ data/
 *.h5
 *.hdf5
 
-# Models
+# Models (ignore all except base model needed for Docker)
 models/*.pkl
+!models/base_simple_model_v0.pkl
 models/*.joblib
 models/*.h5
 
@@ -39,7 +40,6 @@ Thumbs.db
 
 # UV
 .uv/
-uv.lock
 
 # Logs
 *.log
@@ -48,7 +48,6 @@ uv.lock
 .env
 
 # Docker
-*.dockerignore
 docker-compose.override.yml
 
 # Testing
