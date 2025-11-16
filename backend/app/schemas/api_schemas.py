@@ -43,6 +43,10 @@ class PredictionResponse(BaseModel):
         default_factory=list,
         description="List of warnings about missing or defaulted features"
     )
+    friendly_summary: str = Field(
+        ...,
+        description="Human-friendly explanation of the prediction results"
+    )
 
 
 class HealthResponse(BaseModel):

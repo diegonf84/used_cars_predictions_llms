@@ -72,6 +72,7 @@ async def predict_price(request: PredictionRequest):
         # Step 1: Extract features from natural language
         logger.info(f"Extracting features from: {request.description[:100]}...")
         features = llm_service.extract_car_features(request.description)
+        logger.info(f"Extracted features: {features}")
         logger.info("Features extracted successfully")
 
         # Step 2: Validate features and get warnings
@@ -84,13 +85,24 @@ async def predict_price(request: PredictionRequest):
         prediction = model_service.predict(validated_features.model_dump())
         logger.info(f"Prediction successful: ${prediction['price']:,}")
 
-        # Step 4: Build response
+        # Step 4: Generate friendly summary
+        logger.info("Generating friendly summary...")
+        friendly_summary = llm_service.generate_friendly_response(
+            user_description=request.description,
+            price_min=prediction["price_min"],
+            price_max=prediction["price_max"],
+            warnings=warnings,
+        )
+        logger.info("Friendly summary generated")
+
+        # Step 5: Build response
         return PredictionResponse(
             price=prediction["price"],
             price_min=prediction["price_min"],
             price_max=prediction["price_max"],
             confidence=prediction["confidence"],
             warnings=warnings,
+            friendly_summary=friendly_summary,
         )
 
     except ValueError as e:

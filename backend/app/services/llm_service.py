@@ -278,6 +278,61 @@ Return ONLY the JSON object, no other text:"""
 
         return features
 
+    def generate_friendly_response(
+        self,
+        user_description: str,
+        price_min: int,
+        price_max: int,
+        warnings: list[str],
+    ) -> str:
+        """
+        Generate a human-friendly summary of the prediction results.
+
+        Args:
+            user_description: Original user description
+            price_min: Minimum price in range
+            price_max: Maximum price in range
+            warnings: List of warning messages
+
+        Returns:
+            Human-friendly summary text
+        """
+        # Build warnings section
+        warnings_text = "\n".join(f"- {w}" for w in warnings) if warnings else "None - all information was provided"
+
+        prompt = f"""You are a friendly car pricing assistant. Based on the user's car description and our price analysis, write a natural, helpful summary.
+
+**User's Description:**
+"{user_description}"
+
+**Considerations:**
+{warnings_text}
+
+**Instructions:**
+Write a concise 2 paragraph response with this structure:
+
+**Paragraph 1:** Start with a simple greeting (like "Hello" or "Hi there"), then mention that using the information provided and a machine learning model, we estimated the value. DO NOT repeat the actual price numbers - they are shown separately. Just mention that the estimate was made.
+
+**Paragraph 2:** If there are considerations/warnings, explain them in user-friendly, natural language. If no considerations exist (all info was provided), just add a brief positive note about having complete information for an accurate estimate. Don't forget to explain the assumtipons made (e.g., mileage, condition), when they apply.
+
+Keep it warm but concise. Don't repeat back all the features the user already told you. Write directly to the user ("your car", "based on your description").
+
+Generate the response:"""
+
+        try:
+            response = self.model.generate_content(prompt)
+            friendly_text = response.text.strip()
+            logger.info("Friendly response generated successfully")
+            return friendly_text
+
+        except Exception as e:
+            logger.error(f"Failed to generate friendly response: {str(e)}", exc_info=True)
+            # Simple fallback
+            fallback = f"Based on your description, the estimated price range is ${price_min:,} to ${price_max:,}."
+            if warnings:
+                fallback += f"\n\nNote: {warnings[0]}"
+            return fallback
+
 
 # Convenience function for testing
 def test_extraction(api_key: str, user_input: str, model_name: str = "gemini-2.5-flash"):

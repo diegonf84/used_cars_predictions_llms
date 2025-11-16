@@ -12,6 +12,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 
 from backend.app.api.endpoints import router, set_services
@@ -104,14 +106,30 @@ app.add_middleware(
 # Include API router
 app.include_router(router, prefix="/api/v1", tags=["predictions"])
 
+# Mount static files
+project_root = Path(__file__).parent.parent.parent
+frontend_path = project_root / "frontend"
+static_path = frontend_path / "static"
 
-# Root endpoint
+if static_path.exists():
+    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+    logger.info(f"Static files mounted from: {static_path}")
+else:
+    logger.warning(f"Static files directory not found: {static_path}")
+
+
+# Root endpoint - serve index.html
 @app.get("/")
 async def root():
-    """Root endpoint with API information."""
-    return {
-        "message": "Used Car Price Prediction API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/api/v1/health",
-    }
+    """Serve the frontend application."""
+    index_path = frontend_path / "index.html"
+    if index_path.exists():
+        return FileResponse(str(index_path))
+    else:
+        # Fallback to API info if frontend not available
+        return {
+            "message": "Used Car Price Prediction API",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "health": "/api/v1/health",
+        }
