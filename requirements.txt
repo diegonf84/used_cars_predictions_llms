@@ -3,7 +3,15 @@ pandas
 numpy
 scikit-learn
 xgboost
+joblib
 
 # Visualization
 matplotlib
 seaborn
+
+# LLM Integration
+google-generativeai
+
+# Backend API
+pydantic
+python-dotenv

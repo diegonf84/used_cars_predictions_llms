@@ -1,0 +1,849 @@
+Initializing LLM Service...
+Using model: gemini-2.5-flash
+Results will be saved to: /Users/diegofrigerio/Documents/used_cars_predictions_llms/tests/results_20251116_101434.txt
+
+
+================================================================================
+EXAMPLE 1
+================================================================================
+
+Input: 2020 Toyota Camry, 45k miles, automatic transmission, one owner, no accidents, clean title, black interior, FWD, gets about 32 mpg
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Toyota",
+  "year": 2020,
+  "mileage": 45000,
+  "transmission": "Automatic",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "interior_color": "Black",
+  "drivetrain": "front_wheel_drive",
+  "mpg": 32.0,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Toyota",
+  "year": 2020,
+  "mileage": 45000,
+  "transmission": "Automatic",
+  "drivetrain": "front_wheel_drive",
+  "fuel_type": "Gasoline",
+  "interior_color": "Black",
+  "mpg": 32,
+  "accidents_or_damage": 0,
+  "one_owner": 1,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Toyota, actual=Toyota 
+✓ year: expected=2020, actual=2020 
+✓ mileage: expected=45000, actual=45000 
+✓ transmission: expected=Automatic, actual=Automatic 
+✓ one_owner: expected=1, actual=1 
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Black, actual=Black 
+✓ drivetrain: expected=front_wheel_drive, actual=front_wheel_drive 
+✓ mpg: expected=32.0, actual=32 
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 2
+================================================================================
+
+Input: Used Honda Civic 2018
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Honda",
+  "year": 2018,
+  "mileage": null,
+  "transmission": null,
+  "one_owner": null,
+  "accidents_or_damage": null,
+  "interior_color": null,
+  "drivetrain": null,
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Honda",
+  "year": 2018,
+  "mileage": 50000,
+  "transmission": "others",
+  "drivetrain": "others",
+  "fuel_type": "Gasoline",
+  "interior_color": "others",
+  "mpg": 25.0,
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Honda, actual=Honda 
+✓ year: expected=2018, actual=2018 
+○ mileage: expected=None, actual=50000 (default: 50000)
+○ transmission: expected=None, actual=others (default: others)
+○ one_owner: expected=None, actual=0 (default: 0)
+○ accidents_or_damage: expected=None, actual=0 (default: 0)
+○ interior_color: expected=None, actual=others (default: others)
+○ drivetrain: expected=None, actual=others (default: others)
+○ mpg: expected=None, actual=25.0 (default: 25.0)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 3
+================================================================================
+
+Input: Ford F-150 2021, 4x4, automatic, 30k miles, gray interior, no damage, personal use only
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Ford",
+  "year": 2021,
+  "mileage": 30000,
+  "transmission": "Automatic",
+  "one_owner": null,
+  "accidents_or_damage": 0,
+  "interior_color": "Gray",
+  "drivetrain": "four_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": 1
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Ford",
+  "year": 2021,
+  "mileage": 30000,
+  "transmission": "Automatic",
+  "drivetrain": "four_wheel_drive",
+  "interior_color": "Gray",
+  "personal_use_only": 1,
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Ford, actual=Ford 
+✓ year: expected=2021, actual=2021 
+✓ mileage: expected=30000, actual=30000 
+✓ transmission: expected=Automatic, actual=Automatic 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Gray, actual=Gray 
+✓ drivetrain: expected=four_wheel_drive, actual=four_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+✓ personal_use_only: expected=1, actual=1 
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 4
+================================================================================
+
+Input: 2019 Honda Civic manual transmission, 60k miles, black interior, minor accident reported, FWD
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Honda",
+  "year": 2019,
+  "mileage": 60000,
+  "transmission": "6-Speed Manual",
+  "one_owner": null,
+  "accidents_or_damage": 1,
+  "interior_color": "Black",
+  "drivetrain": "front_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Honda",
+  "year": 2019,
+  "mileage": 60000,
+  "transmission": "6-Speed Manual",
+  "drivetrain": "front_wheel_drive",
+  "interior_color": "Black",
+  "accidents_or_damage": 1,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 25.0,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Honda, actual=Honda 
+✓ year: expected=2019, actual=2019 
+✓ mileage: expected=60000, actual=60000 
+✓ transmission: expected=6-Speed Manual, actual=6-Speed Manual 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=1, actual=1 
+✓ interior_color: expected=Black, actual=Black 
+✓ drivetrain: expected=front_wheel_drive, actual=front_wheel_drive 
+○ mpg: expected=None, actual=25.0 (default: 25.0)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 5
+================================================================================
+
+Input: Mercedes-Benz E-Class 2022, 15k miles, AWD, automatic, tan interior, single owner, clean history
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Mercedes-Benz",
+  "year": 2022,
+  "mileage": 15000,
+  "transmission": "Automatic",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "interior_color": "Tan",
+  "drivetrain": "all_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Mercedes-Benz",
+  "year": 2022,
+  "mileage": 15000,
+  "transmission": "Automatic",
+  "drivetrain": "all_wheel_drive",
+  "fuel_type": "Gasoline",
+  "interior_color": "Tan",
+  "accidents_or_damage": 0,
+  "one_owner": 1,
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Mercedes-Benz, actual=Mercedes-Benz 
+✓ year: expected=2022, actual=2022 
+✓ mileage: expected=15000, actual=15000 
+✓ transmission: expected=Automatic, actual=Automatic 
+✓ one_owner: expected=1, actual=1 
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Tan, actual=Tan 
+✓ drivetrain: expected=all_wheel_drive, actual=all_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 6
+================================================================================
+
+Input: 2020 Toyota Prius hybrid, 40k miles, CVT transmission, beige interior, 55 mpg, no accidents
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Toyota",
+  "year": 2020,
+  "mileage": 40000,
+  "transmission": "Automatic CVT",
+  "one_owner": null,
+  "accidents_or_damage": 0,
+  "interior_color": "Beige",
+  "drivetrain": null,
+  "mpg": 55.0,
+  "fuel_type": "Hybrid",
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Toyota",
+  "year": 2020,
+  "mileage": 40000,
+  "transmission": "Automatic CVT",
+  "drivetrain": "others",
+  "fuel_type": "Hybrid",
+  "interior_color": "Beige",
+  "mpg": 55,
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Toyota, actual=Toyota 
+✓ year: expected=2020, actual=2020 
+✓ mileage: expected=40000, actual=40000 
+✓ transmission: expected=Automatic CVT, actual=Automatic CVT 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Beige, actual=Beige 
+○ drivetrain: expected=None, actual=others (default: others)
+✓ mpg: expected=55.0, actual=55 
+✓ fuel_type: expected=Hybrid, actual=Hybrid 
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 7
+================================================================================
+
+Input: Jeep Wrangler 2021, 4WD, manual, 25k miles, clean title, one owner, charcoal interior
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Jeep",
+  "year": 2021,
+  "mileage": 25000,
+  "transmission": "6-Speed Manual",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "interior_color": "Charcoal",
+  "drivetrain": "four_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Jeep",
+  "year": 2021,
+  "mileage": 25000,
+  "transmission": "6-Speed Manual",
+  "drivetrain": "four_wheel_drive",
+  "interior_color": "Charcoal",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Jeep, actual=Jeep 
+✓ year: expected=2021, actual=2021 
+✓ mileage: expected=25000, actual=25000 
+✓ transmission: expected=6-Speed Manual, actual=6-Speed Manual 
+✓ one_owner: expected=1, actual=1 
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Charcoal, actual=Charcoal 
+✓ drivetrain: expected=four_wheel_drive, actual=four_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 8
+================================================================================
+
+Input: 2019 Honda Accord, CVT transmission, 65k miles, FWD, gray interior, no accidents
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Honda",
+  "year": 2019,
+  "mileage": 65000,
+  "transmission": "Automatic CVT",
+  "one_owner": null,
+  "accidents_or_damage": 0,
+  "interior_color": "Gray",
+  "drivetrain": "front_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Honda",
+  "year": 2019,
+  "mileage": 65000,
+  "transmission": "Automatic CVT",
+  "drivetrain": "front_wheel_drive",
+  "interior_color": "Gray",
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 25.0,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Honda, actual=Honda 
+✓ year: expected=2019, actual=2019 
+✓ mileage: expected=65000, actual=65000 
+✓ transmission: expected=Automatic CVT, actual=Automatic CVT 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Gray, actual=Gray 
+✓ drivetrain: expected=front_wheel_drive, actual=front_wheel_drive 
+○ mpg: expected=None, actual=25.0 (default: 25.0)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 9
+================================================================================
+
+Input: BMW 3 Series 2023, 10k miles, 8-speed automatic, AWD, black interior, personal daily driver
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "BMW",
+  "year": 2023,
+  "mileage": 10000,
+  "transmission": "8-Speed Automatic",
+  "one_owner": null,
+  "accidents_or_damage": null,
+  "interior_color": "Black",
+  "drivetrain": "all_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": 1
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "BMW",
+  "year": 2023,
+  "mileage": 10000,
+  "transmission": "8-Speed Automatic",
+  "drivetrain": "all_wheel_drive",
+  "interior_color": "Black",
+  "personal_use_only": 1,
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=BMW, actual=BMW 
+✓ year: expected=2023, actual=2023 
+✓ mileage: expected=10000, actual=10000 
+✓ transmission: expected=8-Speed Automatic, actual=8-Speed Automatic 
+○ one_owner: expected=None, actual=0 (default: 0)
+○ accidents_or_damage: expected=None, actual=0 (default: 0)
+✓ interior_color: expected=Black, actual=Black 
+✓ drivetrain: expected=all_wheel_drive, actual=all_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+✓ personal_use_only: expected=1, actual=1 
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 10
+================================================================================
+
+Input: 2020 Chevrolet Silverado diesel, 4x4, automatic, 50k miles, graphite interior, one owner
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Chevrolet",
+  "year": 2020,
+  "mileage": 50000,
+  "transmission": "Automatic",
+  "one_owner": 1,
+  "accidents_or_damage": null,
+  "interior_color": "Graphite",
+  "drivetrain": "four_wheel_drive",
+  "mpg": null,
+  "fuel_type": "Diesel",
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Chevrolet",
+  "year": 2020,
+  "mileage": 50000,
+  "transmission": "Automatic",
+  "drivetrain": "four_wheel_drive",
+  "fuel_type": "Diesel",
+  "interior_color": "Graphite",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "mpg": 33.0,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Chevrolet, actual=Chevrolet 
+✓ year: expected=2020, actual=2020 
+✓ mileage: expected=50000, actual=50000 
+✓ transmission: expected=Automatic, actual=Automatic 
+✓ one_owner: expected=1, actual=1 
+○ accidents_or_damage: expected=None, actual=0 (default: 0)
+✓ interior_color: expected=Graphite, actual=Graphite 
+✓ drivetrain: expected=four_wheel_drive, actual=four_wheel_drive 
+○ mpg: expected=None, actual=33.0 (default: 33.0)
+✓ fuel_type: expected=Diesel, actual=Diesel 
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 11
+================================================================================
+
+Input: Ford F-150 2022, 10-speed automatic transmission, 4x4, 18k miles, black interior, clean title
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Ford",
+  "year": 2022,
+  "mileage": 18000,
+  "transmission": "10-Speed Automatic",
+  "one_owner": null,
+  "accidents_or_damage": 0,
+  "interior_color": "Black",
+  "drivetrain": "four_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Ford",
+  "year": 2022,
+  "mileage": 18000,
+  "transmission": "10-Speed Automatic",
+  "drivetrain": "four_wheel_drive",
+  "interior_color": "Black",
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Ford, actual=Ford 
+✓ year: expected=2022, actual=2022 
+✓ mileage: expected=18000, actual=18000 
+✓ transmission: expected=10-Speed Automatic, actual=10-Speed Automatic 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Black, actual=Black 
+✓ drivetrain: expected=four_wheel_drive, actual=four_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 12
+================================================================================
+
+Input: 2021 Kia Forte, CVT, FWD, 35k miles, jet black interior, no accidents, single owner
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Kia",
+  "year": 2021,
+  "mileage": 35000,
+  "transmission": "Automatic CVT",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "interior_color": "Jet Black",
+  "drivetrain": "front_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Kia",
+  "year": 2021,
+  "mileage": 35000,
+  "transmission": "Automatic CVT",
+  "drivetrain": "front_wheel_drive",
+  "interior_color": "Jet Black",
+  "accidents_or_damage": 0,
+  "one_owner": 1,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Kia, actual=Kia 
+✓ year: expected=2021, actual=2021 
+✓ mileage: expected=35000, actual=35000 
+✓ transmission: expected=Automatic CVT, actual=Automatic CVT 
+✓ one_owner: expected=1, actual=1 
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Jet Black, actual=Jet Black 
+✓ drivetrain: expected=front_wheel_drive, actual=front_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 13
+================================================================================
+
+Input: BMW X5 2023, 8-speed automatic, AWD, 12k miles, beige interior, one owner, no accidents
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "BMW",
+  "year": 2023,
+  "mileage": 12000,
+  "transmission": "8-Speed Automatic",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "interior_color": "Beige",
+  "drivetrain": "all_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "BMW",
+  "year": 2023,
+  "mileage": 12000,
+  "transmission": "8-Speed Automatic",
+  "drivetrain": "all_wheel_drive",
+  "interior_color": "Beige",
+  "one_owner": 1,
+  "accidents_or_damage": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=BMW, actual=BMW 
+✓ year: expected=2023, actual=2023 
+✓ mileage: expected=12000, actual=12000 
+✓ transmission: expected=8-Speed Automatic, actual=8-Speed Automatic 
+✓ one_owner: expected=1, actual=1 
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Beige, actual=Beige 
+✓ drivetrain: expected=all_wheel_drive, actual=all_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 14
+================================================================================
+
+Input: 2012 Ford Focus, 90k miles, manual, front wheel drive, minor damage, gray interior
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "Ford",
+  "year": 2012,
+  "mileage": 90000,
+  "transmission": "6-Speed Manual",
+  "one_owner": null,
+  "accidents_or_damage": 1,
+  "interior_color": "Gray",
+  "drivetrain": "front_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "Ford",
+  "year": 2012,
+  "mileage": 90000,
+  "transmission": "6-Speed Manual",
+  "drivetrain": "front_wheel_drive",
+  "interior_color": "Gray",
+  "accidents_or_damage": 1,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 22.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=Ford, actual=Ford 
+✓ year: expected=2012, actual=2012 
+✓ mileage: expected=90000, actual=90000 
+✓ transmission: expected=6-Speed Manual, actual=6-Speed Manual 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=1, actual=1 
+✓ interior_color: expected=Gray, actual=Gray 
+✓ drivetrain: expected=front_wheel_drive, actual=front_wheel_drive 
+○ mpg: expected=None, actual=22.5 (default: 22.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+Waiting 3 seconds before next example...
+
+================================================================================
+EXAMPLE 15
+================================================================================
+
+Input: 2021 Subaru Outback, AWD, automatic, 28k miles, charcoal black interior, clean title
+
+Expected Output (user-provided features only):
+{
+  "manufacturer": "others",
+  "year": 2021,
+  "mileage": 28000,
+  "transmission": "Automatic",
+  "one_owner": null,
+  "accidents_or_damage": 0,
+  "interior_color": "Charcoal Black",
+  "drivetrain": "all_wheel_drive",
+  "mpg": null,
+  "fuel_type": null,
+  "personal_use_only": null
+}
+
+Actual Output (with all defaults filled):
+{
+  "manufacturer": "others",
+  "year": 2021,
+  "mileage": 28000,
+  "transmission": "Automatic",
+  "drivetrain": "all_wheel_drive",
+  "interior_color": "Charcoal Black",
+  "accidents_or_damage": 0,
+  "one_owner": 0,
+  "fuel_type": "Gasoline",
+  "mpg": 27.5,
+  "personal_use_only": 0,
+  "driver_reviews_num": 64,
+  "seller_rating": 4.5,
+  "driver_rating": 4.7
+}
+
+--- Comparison (user-provided features) ---
+✓ manufacturer: expected=others, actual=others 
+✓ year: expected=2021, actual=2021 
+✓ mileage: expected=28000, actual=28000 
+✓ transmission: expected=Automatic, actual=Automatic 
+○ one_owner: expected=None, actual=0 (default: 0)
+✓ accidents_or_damage: expected=0, actual=0 
+✓ interior_color: expected=Charcoal Black, actual=Charcoal Black 
+✓ drivetrain: expected=all_wheel_drive, actual=all_wheel_drive 
+○ mpg: expected=None, actual=27.5 (default: 27.5)
+○ fuel_type: expected=None, actual=Gasoline (default: Gasoline)
+○ personal_use_only: expected=None, actual=0 (default: 0)
+
+✓ PASS
+
+================================================================================
+SUMMARY
+================================================================================
+
+Passed: 15/15
+Failed: 0/15

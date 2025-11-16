@@ -12,6 +12,7 @@ ENV/
 # Jupyter
 .ipynb_checkpoints
 *.ipynb_checkpoints/
+notebooks/notebook_for_testing.ipynb
 
 # IDEs
 .vscode/
@@ -42,3 +43,16 @@ uv.lock
 
 # Logs
 *.log
+
+# Environment variables
+.env
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
