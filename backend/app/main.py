@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from backend.app.api.endpoints import router, set_services
 from backend.app.services.llm_service import LLMService
 from backend.app.services.model_service import ModelService
+from backend.app.services.rate_limiter import DailyRateLimiter
 
 # Load environment variables
 load_dotenv()
@@ -33,6 +34,7 @@ logger = logging.getLogger(__name__)
 # Global service instances
 llm_service: LLMService = None
 model_service: ModelService = None
+rate_limiter: DailyRateLimiter = None
 
 
 @asynccontextmanager
@@ -42,12 +44,17 @@ async def lifespan(app: FastAPI):
 
     Loads services at startup and cleans up at shutdown.
     """
-    global llm_service, model_service
+    global llm_service, model_service, rate_limiter
 
     # Startup
     logger.info("Starting up application...")
 
     try:
+        # Initialize rate limiter
+        logger.info("Initializing rate limiter...")
+        rate_limiter = DailyRateLimiter(max_requests_per_day=30)
+        logger.info("Rate limiter initialized: 30 requests/day")
+
         # Initialize LLM service
         logger.info("Initializing LLM service...")
         api_key = os.getenv("GEMINI_API_KEY")
@@ -71,7 +78,7 @@ async def lifespan(app: FastAPI):
         logger.info("Model loaded successfully")
 
         # Set services in endpoints
-        set_services(llm=llm_service, model=model_service)
+        set_services(llm=llm_service, model=model_service, limiter=rate_limiter)
         logger.info("Services configured successfully")
 
         logger.info("Application startup complete")

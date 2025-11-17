@@ -248,5 +248,204 @@ All requests must include the `"description"` key:
 - [x] FastAPI backend with REST endpoints
 - [x] Web frontend interface
 - [x] Docker deployment setup
-- [ ] Cloud deployment (Railway, Render, or similar free tier)
-- [ ] Rate limiting and API security
+- [x] Rate limiting (30 requests/day to protect against LLM API costs)
+- [ ] Deploy to Fly.io (cloud deployment)
+- [ ] GitHub Actions CI/CD pipeline (automatic deployment)
+
+## Deployment Plan (Fly.io + GitHub Actions)
+
+### Phase 1: Manual Deployment to Fly.io (Quick Start)
+
+**Goal**: Get the app deployed to production quickly.
+
+**Time estimate**: ~30 minutes
+
+**Steps**:
+
+1. **Install Fly.io CLI**:
+   ```bash
+   brew install flyctl
+   ```
+
+2. **Login to Fly.io**:
+   ```bash
+   fly auth login
+   ```
+
+3. **Create `fly.toml` configuration file** (in project root):
+   ```toml
+   app = "car-price-predictor"  # Will be auto-generated, but you can customize
+   primary_region = "lax"  # Los Angeles (or closest to you)
+
+   [build]
+
+   [env]
+     PORT = "8000"
+
+   [http_service]
+     internal_port = 8000
+     force_https = true
+     auto_stop_machines = false  # Keep always running (within free tier)
+     auto_start_machines = true
+     min_machines_running = 1
+
+   [[vm]]
+     memory = '256mb'
+     cpu_kind = 'shared'
+     cpus = 1
+   ```
+
+4. **Initialize Fly.io app**:
+   ```bash
+   fly launch
+   # Answer prompts:
+   # - Choose app name (or use auto-generated)
+   # - Choose region (lax, iad, etc.)
+   # - Don't add PostgreSQL (No)
+   # - Don't add Redis (No)
+   # - Don't deploy yet (No)
+   ```
+
+5. **Set your API key as a secret**:
+   ```bash
+   fly secrets set GEMINI_API_KEY=your_actual_api_key_here
+   ```
+
+6. **Deploy**:
+   ```bash
+   fly deploy
+   ```
+
+7. **Open your deployed app**:
+   ```bash
+   fly open
+   ```
+
+**Monitoring**:
+- Check logs: `fly logs`
+- Check status: `fly status`
+- Check usage/costs: Fly.io dashboard → Usage section
+
+---
+
+### Phase 2: GitHub Actions CI/CD (Professional Workflow)
+
+**Goal**: Automatic deployment on every push to `main` branch.
+
+**Time estimate**: ~45 minutes
+
+**Benefits**:
+- ✅ Automatic deployment (push to GitHub = deployed)
+- ✅ Portfolio enhancement: "Implemented CI/CD pipeline with GitHub Actions"
+- ✅ Professional workflow
+- ✅ Can add automated testing
+- ✅ Valuable DevOps skill
+
+**Steps**:
+
+1. **Get Fly.io API token**:
+   ```bash
+   fly auth token
+   # Copy the token that appears
+   ```
+
+2. **Add token to GitHub repository secrets**:
+   - Go to your GitHub repo
+   - Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `FLY_API_TOKEN`
+   - Value: (paste the token from step 1)
+   - Click "Add secret"
+
+3. **Create `.github/workflows/deploy.yml`**:
+   ```yaml
+   name: Deploy to Fly.io
+
+   on:
+     push:
+       branches:
+         - main
+
+   jobs:
+     deploy:
+       name: Deploy to Fly.io
+       runs-on: ubuntu-latest
+
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+
+         - name: Set up Fly.io CLI
+           uses: superfly/flyctl-actions/setup-flyctl@master
+
+         - name: Deploy to Fly.io
+           run: flyctl deploy --remote-only
+           env:
+             FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+   ```
+
+4. **Commit and push**:
+   ```bash
+   git add .github/workflows/deploy.yml
+   git commit -m "Add GitHub Actions CI/CD pipeline for Fly.io deployment"
+   git push origin main
+   ```
+
+5. **Watch the deployment**:
+   - Go to GitHub repo → Actions tab
+   - You'll see the workflow running
+   - Green checkmark = deployed successfully!
+
+**Optional enhancements** (add later):
+- Run tests before deployment
+- Deploy to staging environment first
+- Slack/Discord notifications on deployment
+- Deployment status badges in README
+
+---
+
+### Phase 3: Monitoring & Optimization (Post-Deployment)
+
+**After deployment**:
+
+1. **Monitor costs** (weekly for first month):
+   - Fly.io dashboard → Usage/Cost Explorer
+   - Should stay at $0.00 with your traffic
+   - Rate limiter protects against LLM API overuse
+
+2. **Monitor rate limiter**:
+   - Check logs for "Rate limit exceeded" messages
+   - Adjust limit if needed (currently 30/day)
+
+3. **Set up basic monitoring**:
+   - Fly.io health checks (already configured)
+   - Optional: Add error tracking (Sentry free tier)
+   - Optional: Add analytics (Plausible, Simple Analytics)
+
+**Estimated monthly costs**:
+- **Fly.io**: $0 (free tier: 3 VMs @ 256MB)
+- **Gemini API**: ~$0-1 (30 requests/day × $0.01/request = $0.30/day max, but likely less)
+- **Total**: ~$0-10/month
+
+---
+
+### Quick Reference Commands
+
+```bash
+# Fly.io deployment
+fly deploy                    # Deploy latest code
+fly logs                      # View logs
+fly status                    # Check app status
+fly open                      # Open app in browser
+fly ssh console               # SSH into container (debugging)
+fly apps destroy APP_NAME     # Delete app (stop all charges)
+
+# Cost monitoring
+fly apps list                 # See all apps
+# Then check Fly.io dashboard → Cost Explorer
+
+# Local development
+uvicorn backend.app.main:app --reload    # Run locally with hot reload
+docker compose up -d                      # Test Docker build locally
+docker compose logs -f                    # View local Docker logs
+```

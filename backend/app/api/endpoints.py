@@ -13,6 +13,7 @@ from backend.app.schemas.api_schemas import (
 )
 from backend.app.services.llm_service import LLMService
 from backend.app.services.model_service import ModelService
+from backend.app.services.rate_limiter import DailyRateLimiter
 from backend.app.services.validation import validate_features
 
 logger = logging.getLogger(__name__)
@@ -22,13 +23,15 @@ router = APIRouter()
 # These will be set by the main app at startup
 llm_service: LLMService = None
 model_service: ModelService = None
+rate_limiter: DailyRateLimiter = None
 
 
-def set_services(llm: LLMService, model: ModelService):
+def set_services(llm: LLMService, model: ModelService, limiter: DailyRateLimiter):
     """Set service instances (called from main app)."""
-    global llm_service, model_service
+    global llm_service, model_service, rate_limiter
     llm_service = llm
     model_service = model
+    rate_limiter = limiter
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -60,6 +63,18 @@ async def predict_price(request: PredictionRequest):
     Raises:
         HTTPException: If services are not initialized or prediction fails
     """
+    # Check rate limit first
+    if rate_limiter is not None:
+        if not rate_limiter.is_allowed():
+            remaining = rate_limiter.get_remaining()
+            logger.warning(f"Rate limit exceeded. Remaining: {remaining}")
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Daily request limit exceeded. Please try again tomorrow. (Limit: {rate_limiter.max_requests_per_day} requests/day)",
+            )
+        # Increment counter after check passes
+        rate_limiter.increment()
+
     # Check services are initialized
     if llm_service is None or model_service is None:
         logger.error("Services not initialized")
