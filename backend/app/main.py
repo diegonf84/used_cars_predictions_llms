@@ -20,6 +20,12 @@ from backend.app.api.endpoints import router, set_services
 from backend.app.services.llm_service import LLMService
 from backend.app.services.model_service import ModelService
 from backend.app.services.rate_limiter import DailyRateLimiter
+from backend.app.config import (
+    GEMINI_API_KEY,
+    RATE_LIMIT_PER_DAY,
+    MODEL_PATH,
+    API_VERSION_PREFIX,
+)
 
 # Load environment variables
 load_dotenv()
@@ -52,29 +58,25 @@ async def lifespan(app: FastAPI):
     try:
         # Initialize rate limiter
         logger.info("Initializing rate limiter...")
-        rate_limiter = DailyRateLimiter(max_requests_per_day=30)
-        logger.info("Rate limiter initialized: 30 requests/day")
+        rate_limiter = DailyRateLimiter(max_requests_per_day=RATE_LIMIT_PER_DAY)
+        logger.info(f"Rate limiter initialized: {RATE_LIMIT_PER_DAY} requests/day")
 
         # Initialize LLM service
         logger.info("Initializing LLM service...")
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
+        if not GEMINI_API_KEY:
             logger.warning("GEMINI_API_KEY not found in environment")
             raise ValueError("GEMINI_API_KEY environment variable is required")
 
-        llm_service = LLMService(api_key=api_key)
+        llm_service = LLMService(api_key=GEMINI_API_KEY)
         logger.info(f"LLM service initialized with model: {llm_service.model_name}")
 
         # Initialize model service
         logger.info("Loading ML model...")
-        project_root = Path(__file__).parent.parent.parent
-        model_path = project_root / "models" / "base_simple_model_v0.pkl"
+        if not Path(MODEL_PATH).exists():
+            logger.error(f"Model file not found: {MODEL_PATH}")
+            raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
 
-        if not model_path.exists():
-            logger.error(f"Model file not found: {model_path}")
-            raise FileNotFoundError(f"Model file not found: {model_path}")
-
-        model_service = ModelService(model_path=str(model_path))
+        model_service = ModelService(model_path=str(MODEL_PATH))
         logger.info("Model loaded successfully")
 
         # Set services in endpoints
@@ -111,7 +113,7 @@ app.add_middleware(
 )
 
 # Include API router
-app.include_router(router, prefix="/api/v1", tags=["predictions"])
+app.include_router(router, prefix=API_VERSION_PREFIX, tags=["predictions"])
 
 # Mount static files
 project_root = Path(__file__).parent.parent.parent

@@ -10,6 +10,7 @@ import logging
 from typing import Dict, Any, Optional
 import google.generativeai as genai
 
+from backend.app.config import GEMINI_MODEL_NAME, LLM_MAX_RETRIES
 from backend.app.constants import (
     MANUFACTURERS,
     TRANSMISSIONS,
@@ -31,14 +32,17 @@ logger = logging.getLogger(__name__)
 class LLMService:
     """Service for extracting car features using LLM."""
 
-    def __init__(self, api_key: str, model_name: str = "gemini-2.5-flash"):
+    def __init__(self, api_key: str, model_name: str = None):
         """
         Initialize LLM service.
 
         Args:
             api_key: Google Gemini API key
-            model_name: Model to use (default: gemini-2.5-flash)
+            model_name: Model to use (default: from config.GEMINI_MODEL_NAME)
         """
+        if model_name is None:
+            model_name = GEMINI_MODEL_NAME
+
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model_name)
         self.model_name = model_name
@@ -149,14 +153,14 @@ Return ONLY the JSON object, no other text:"""
         return prompt
 
     def extract_car_features(
-        self, user_input: str, max_retries: int = 3
+        self, user_input: str, max_retries: int = None
     ) -> Dict[str, Any]:
         """
         Extract car features from natural language description.
 
         Args:
             user_input: User's car description
-            max_retries: Maximum number of retry attempts
+            max_retries: Maximum number of retry attempts (default: from config.LLM_MAX_RETRIES)
 
         Returns:
             Dictionary with extracted features (nulls for missing values)
@@ -166,6 +170,9 @@ Return ONLY the JSON object, no other text:"""
         """
         if not user_input or not user_input.strip():
             raise ValueError("User input cannot be empty")
+
+        if max_retries is None:
+            max_retries = LLM_MAX_RETRIES
 
         prompt = self._build_extraction_prompt(user_input)
 
@@ -335,14 +342,14 @@ Generate the response:"""
 
 
 # Convenience function for testing
-def test_extraction(api_key: str, user_input: str, model_name: str = "gemini-2.5-flash"):
+def test_extraction(api_key: str, user_input: str, model_name: str = None):
     """
     Test function for quick extraction testing.
 
     Args:
         api_key: Google Gemini API key
         user_input: Car description
-        model_name: Model to use
+        model_name: Model to use (default: from config)
 
     Returns:
         Extracted features dictionary

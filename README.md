@@ -1,6 +1,6 @@
 # Used Cars Price Prediction with LLM Integration
 
-ML application that predicts used car prices from natural language descriptions using XGBoost and Google Gemini API.
+ML application that predicts used car prices from natural language descriptions using XGBoost and Google Gemini models.
 
 ## What's Built
 
@@ -11,7 +11,7 @@ ML application that predicts used car prices from natural language descriptions 
 
 ### Phase 2: LLM Integration ✅
 - Natural language feature extraction (`backend/app/services/llm_service.py`)
-- Google Gemini API integration (`gemini-2.5-flash`)
+- Google Gemini API integration (configurable model selection)
 - Structured prompt engineering with few-shot learning
 - Automatic default filling for missing features
 
@@ -60,6 +60,40 @@ After submission, the app displays the estimated price range along with an AI-ge
 
 ![Prediction Results](docs/images/prediction-results.png)
 
+## Configuration
+
+The application uses a centralized configuration system (`backend/app/config.py`) that allows easy customization via environment variables.
+
+### Available Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `GEMINI_API_KEY` | *(required)* | Google Gemini API key |
+| `GEMINI_MODEL_NAME` | `gemini-2.5-flash` | Gemini model to use (see [available models](https://ai.google.dev/gemini-api/docs/models/gemini)) |
+| `RATE_LIMIT_PER_DAY` | `30` | Maximum API requests per day |
+| `LLM_MAX_RETRIES` | `3` | Retry attempts for LLM API calls |
+
+### How to Override
+
+**Local (.env file):**
+```bash
+cp .env.example .env
+# Edit .env:
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL_NAME=gemini-1.5-pro  # Optional: use a different model
+RATE_LIMIT_PER_DAY=100             # Optional: increase rate limit
+```
+
+**Production (Fly.io):**
+```bash
+fly secrets set GEMINI_MODEL_NAME=gemini-1.5-pro
+fly secrets set RATE_LIMIT_PER_DAY=100
+```
+
+Changes via `fly secrets set` take effect immediately (no rebuild needed).
+
+---
+
 ## Setup
 
 ### Option 1: Docker (Recommended for Quick Start)
@@ -71,10 +105,11 @@ After submission, the app displays the estimated price range along with an AI-ge
    export GEMINI_API_KEY=your_api_key_here
    ```
 
-   **Method B - Using .env file (optional):**
+   **Method B - Using .env file (recommended):**
    ```bash
    cp .env.example .env
    # Edit .env and add your GEMINI_API_KEY
+   # Optionally customize: GEMINI_MODEL_NAME, RATE_LIMIT_PER_DAY, etc.
    ```
 
 2. **Build and run:**
@@ -108,7 +143,13 @@ After submission, the app displays the estimated price range along with an AI-ge
 
 2. **Set up environment variables:**
    ```bash
+   # Option 1: Export directly
    export GEMINI_API_KEY=your_api_key_here
+
+   # Option 2: Use .env file (recommended)
+   cp .env.example .env
+   # Edit .env to add your GEMINI_API_KEY
+   # Optionally customize model and rate limits
    ```
 
 3. **Run the application:**
@@ -249,22 +290,31 @@ All requests must include the `"description"` key:
 - [x] Web frontend interface
 - [x] Docker deployment setup
 - [x] Rate limiting (30 requests/day to protect against LLM API costs)
-- [ ] Deploy to Fly.io (cloud deployment)
+- [x] Fly.io deployment configuration (ready to deploy)
+- [ ] Deploy to Fly.io (run `fly launch`)
 - [ ] GitHub Actions CI/CD pipeline (automatic deployment)
 
-## Deployment Plan (Fly.io + GitHub Actions)
+## Deployment to Fly.io (Free Tier)
 
-### Phase 1: Manual Deployment to Fly.io (Quick Start)
+### Quick Start Deployment
 
-**Goal**: Get the app deployed to production quickly.
+**Time estimate**: ~10 minutes
 
-**Time estimate**: ~30 minutes
+The project includes a pre-configured `fly.toml` file optimized for the **Fly.io free tier** with:
+- ✅ Auto-stop/start machines (scale to zero when idle)
+- ✅ Health checks configured
+- ✅ 256MB RAM, 1 shared CPU (fits in free tier)
+- ✅ HTTPS enabled
 
 **Steps**:
 
-1. **Install Fly.io CLI**:
+1. **Install Fly.io CLI** (if not installed):
    ```bash
+   # macOS
    brew install flyctl
+
+   # Linux/WSL
+   curl -L https://fly.io/install.sh | sh
    ```
 
 2. **Login to Fly.io**:
@@ -272,59 +322,40 @@ All requests must include the `"description"` key:
    fly auth login
    ```
 
-3. **Create `fly.toml` configuration file** (in project root):
-   ```toml
-   app = "car-price-predictor"  # Will be auto-generated, but you can customize
-   primary_region = "lax"  # Los Angeles (or closest to you)
-
-   [build]
-
-   [env]
-     PORT = "8000"
-
-   [http_service]
-     internal_port = 8000
-     force_https = true
-     auto_stop_machines = false  # Keep always running (within free tier)
-     auto_start_machines = true
-     min_machines_running = 1
-
-   [[vm]]
-     memory = '256mb'
-     cpu_kind = 'shared'
-     cpus = 1
-   ```
-
-4. **Initialize Fly.io app**:
+3. **Launch the app** (first time only):
    ```bash
    fly launch
-   # Answer prompts:
-   # - Choose app name (or use auto-generated)
-   # - Choose region (lax, iad, etc.)
-   # - Don't add PostgreSQL (No)
-   # - Don't add Redis (No)
-   # - Don't deploy yet (No)
+   # This will:
+   # - Read the existing fly.toml configuration
+   # - Prompt for app name (or use auto-generated)
+   # - Prompt for region (choose closest to you: ord=Chicago, iad=Virginia, lax=LA)
+   # - Ask about PostgreSQL (No)
+   # - Ask about Redis (No)
+   # - Ask to deploy now (Yes)
    ```
 
-5. **Set your API key as a secret**:
+4. **Set your API key as a secret**:
    ```bash
    fly secrets set GEMINI_API_KEY=your_actual_api_key_here
    ```
 
-6. **Deploy**:
+5. **Deploy** (after initial launch or for updates):
    ```bash
    fly deploy
    ```
 
-7. **Open your deployed app**:
+6. **Open your deployed app**:
    ```bash
    fly open
+   # Or visit: https://your-app-name.fly.dev
    ```
 
 **Monitoring**:
-- Check logs: `fly logs`
-- Check status: `fly status`
-- Check usage/costs: Fly.io dashboard → Usage section
+```bash
+fly logs              # View real-time logs
+fly status            # Check app status
+fly dashboard         # Open web dashboard
+```
 
 ---
 
@@ -422,10 +453,15 @@ All requests must include the `"description"` key:
    - Optional: Add error tracking (Sentry free tier)
    - Optional: Add analytics (Plausible, Simple Analytics)
 
-**Estimated monthly costs**:
-- **Fly.io**: $0 (free tier: 3 VMs @ 256MB)
-- **Gemini API**: ~$0-1 (30 requests/day × $0.01/request = $0.30/day max, but likely less)
-- **Total**: ~$0-10/month
+**Estimated monthly costs** (for portfolio/demo use):
+- **Fly.io**: **$0** (free tier includes: 3 shared-cpu-1x VMs @ 256MB RAM each - this app uses 1 VM @ 256MB)
+- **Gemini API**: **$0** (free tier includes 15 requests/minute, 1,500 requests/day - our rate limiter caps at 30/day)
+- **Total**: **$0/month** for portfolio use 🎉
+
+> **Note**: With scale-to-zero configured, your app will:
+> - Stop when inactive (saves resources)
+> - Auto-start when someone visits (may take 3-5 seconds on first request)
+> - Perfect for portfolio/demo purposes!
 
 ---
 
