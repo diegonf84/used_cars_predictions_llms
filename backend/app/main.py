@@ -70,17 +70,12 @@ async def lifespan(app: FastAPI):
         llm_service = LLMService(api_key=GEMINI_API_KEY)
         logger.info(f"LLM service initialized with model: {llm_service.model_name}")
 
-        # Initialize model service
-        logger.info("Loading ML model...")
-        if not Path(MODEL_PATH).exists():
-            logger.error(f"Model file not found: {MODEL_PATH}")
-            raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
+        # Note: Model service will be lazy-loaded on first prediction request
+        # This reduces startup memory usage from ~138MB to minimal
+        logger.info("ML model will be loaded on first prediction request (lazy loading)")
 
-        model_service = ModelService(model_path=str(MODEL_PATH))
-        logger.info("Model loaded successfully")
-
-        # Set services in endpoints
-        set_services(llm=llm_service, model=model_service, limiter=rate_limiter)
+        # Set services in endpoints (model_service=None for now)
+        set_services(llm=llm_service, model=None, limiter=rate_limiter)
         logger.info("Services configured successfully")
 
         logger.info("Application startup complete")

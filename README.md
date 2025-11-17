@@ -291,7 +291,7 @@ All requests must include the `"description"` key:
 - [x] Docker deployment setup
 - [x] Rate limiting (30 requests/day to protect against LLM API costs)
 - [x] Fly.io deployment configuration (ready to deploy)
-- [ ] Deploy to Fly.io (run `fly launch`)
+- [x] Deploy to Fly.io (run `fly launch`)
 - [ ] GitHub Actions CI/CD pipeline (automatic deployment)
 
 ## Deployment to Fly.io (Free Tier)

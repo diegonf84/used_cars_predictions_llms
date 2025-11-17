@@ -3,6 +3,8 @@ FastAPI endpoints for car price prediction.
 """
 
 import logging
+from pathlib import Path
+from typing import Optional
 from fastapi import APIRouter, HTTPException, status
 
 from backend.app.schemas.api_schemas import (
@@ -15,6 +17,7 @@ from backend.app.services.llm_service import LLMService
 from backend.app.services.model_service import ModelService
 from backend.app.services.rate_limiter import DailyRateLimiter
 from backend.app.services.validation import validate_features
+from backend.app.config import MODEL_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +25,36 @@ router = APIRouter()
 
 # These will be set by the main app at startup
 llm_service: LLMService = None
-model_service: ModelService = None
+model_service: Optional[ModelService] = None
 rate_limiter: DailyRateLimiter = None
 
 
-def set_services(llm: LLMService, model: ModelService, limiter: DailyRateLimiter):
+def set_services(llm: LLMService, model: Optional[ModelService], limiter: DailyRateLimiter):
     """Set service instances (called from main app)."""
     global llm_service, model_service, rate_limiter
     llm_service = llm
     model_service = model
     rate_limiter = limiter
+
+
+def _load_model_if_needed():
+    """
+    Lazy load the ML model on first prediction request.
+    This reduces startup memory usage and allows the app to start within 256MB.
+    """
+    global model_service
+
+    if model_service is None:
+        logger.info("Lazy loading ML model on first request...")
+
+        if not Path(MODEL_PATH).exists():
+            logger.error(f"Model file not found: {MODEL_PATH}")
+            raise FileNotFoundError(f"Model file not found: {MODEL_PATH}")
+
+        model_service = ModelService(model_path=str(MODEL_PATH))
+        logger.info("ML model loaded successfully")
+
+    return model_service
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -75,15 +98,17 @@ async def predict_price(request: PredictionRequest):
         # Increment counter after check passes
         rate_limiter.increment()
 
-    # Check services are initialized
-    if llm_service is None or model_service is None:
-        logger.error("Services not initialized")
+    # Check LLM service is initialized
+    if llm_service is None:
+        logger.error("LLM service not initialized")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Services not initialized. Please try again later.",
         )
 
     try:
+        # Lazy load ML model on first request
+        model = _load_model_if_needed()
         # Step 1: Extract features from natural language
         logger.info(f"Extracting features from: {request.description[:100]}...")
         features = llm_service.extract_car_features(request.description)
@@ -97,7 +122,7 @@ async def predict_price(request: PredictionRequest):
 
         # Step 3: Make prediction
         logger.info("Making price prediction...")
-        prediction = model_service.predict(validated_features.model_dump())
+        prediction = model.predict(validated_features.model_dump())
         logger.info(f"Prediction successful: ${prediction['price']:,}")
 
         # Step 4: Generate friendly summary
