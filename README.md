@@ -2,6 +2,8 @@
 
 ML application that predicts used car prices from natural language descriptions using XGBoost and Google Gemini models.
 
+You can test it (https://used-cars-predictions-llms.onrender.com/) (1st time accesing, wait for a minute to load the webpage)
+
 ## What's Built
 
 ### Phase 1: Project Structure ✅
@@ -84,13 +86,14 @@ GEMINI_MODEL_NAME=gemini-1.5-pro  # Optional: use a different model
 RATE_LIMIT_PER_DAY=100             # Optional: increase rate limit
 ```
 
-**Production (Fly.io):**
+**Production (Render):**
 ```bash
-fly secrets set GEMINI_MODEL_NAME=gemini-1.5-pro
-fly secrets set RATE_LIMIT_PER_DAY=100
+# Set environment variables in Render dashboard
+GEMINI_MODEL_NAME=gemini-1.5-pro
+RATE_LIMIT_PER_DAY=100
 ```
 
-Changes via `fly secrets set` take effect immediately (no rebuild needed).
+Changes via Render environment variables take effect on the next deploy.
 
 ---
 
@@ -290,196 +293,37 @@ All requests must include the `"description"` key:
 - [x] Web frontend interface
 - [x] Docker deployment setup
 - [x] Rate limiting (30 requests/day to protect against LLM API costs)
-- [x] Fly.io deployment configuration (ready to deploy)
-- [x] Deploy to Fly.io (run `fly launch`)
 - [ ] GitHub Actions CI/CD pipeline (automatic deployment)
 
-## Deployment to Fly.io (Free Tier)
+## Deployment
 
-### Quick Start Deployment
+This application is ready for deployment on services like Render, Heroku, or any platform that supports Docker containers.
 
-**Time estimate**: ~10 minutes
+### General Steps
 
-The project includes a pre-configured `fly.toml` file optimized for the **Fly.io free tier** with:
-- ✅ Auto-stop/start machines (scale to zero when idle)
-- ✅ Health checks configured
-- ✅ 256MB RAM, 1 shared CPU (fits in free tier)
-- ✅ HTTPS enabled
+1. **Fork this repository** to your GitHub account.
+2. **Connect your repository** to your chosen deployment platform (e.g., Render).
+3. **Configure environment variables** in the platform's dashboard:
+   - `GEMINI_API_KEY` (required)
+   - `GEMINI_MODEL_NAME` (optional)
+   - `RATE_LIMIT_PER_DAY` (optional)
+4. **Deploy** the application. The platform should automatically detect the `Dockerfile` and build/deploy the image.
 
-**Steps**:
+### Cost Monitoring
 
-1. **Install Fly.io CLI** (if not installed):
-   ```bash
-   # macOS
-   brew install flyctl
-
-   # Linux/WSL
-   curl -L https://fly.io/install.sh | sh
-   ```
-
-2. **Login to Fly.io**:
-   ```bash
-   fly auth login
-   ```
-
-3. **Launch the app** (first time only):
-   ```bash
-   fly launch
-   # This will:
-   # - Read the existing fly.toml configuration
-   # - Prompt for app name (or use auto-generated)
-   # - Prompt for region (choose closest to you: ord=Chicago, iad=Virginia, lax=LA)
-   # - Ask about PostgreSQL (No)
-   # - Ask about Redis (No)
-   # - Ask to deploy now (Yes)
-   ```
-
-4. **Set your API key as a secret**:
-   ```bash
-   fly secrets set GEMINI_API_KEY=your_actual_api_key_here
-   ```
-
-5. **Deploy** (after initial launch or for updates):
-   ```bash
-   fly deploy
-   ```
-
-6. **Open your deployed app**:
-   ```bash
-   fly open
-   # Or visit: https://your-app-name.fly.dev
-   ```
-
-**Monitoring**:
-```bash
-fly logs              # View real-time logs
-fly status            # Check app status
-fly dashboard         # Open web dashboard
-```
-
----
-
-### Phase 2: GitHub Actions CI/CD (Professional Workflow)
-
-**Goal**: Automatic deployment on every push to `main` branch.
-
-**Time estimate**: ~45 minutes
-
-**Benefits**:
-- ✅ Automatic deployment (push to GitHub = deployed)
-- ✅ Portfolio enhancement: "Implemented CI/CD pipeline with GitHub Actions"
-- ✅ Professional workflow
-- ✅ Can add automated testing
-- ✅ Valuable DevOps skill
-
-**Steps**:
-
-1. **Get Fly.io API token**:
-   ```bash
-   fly auth token
-   # Copy the token that appears
-   ```
-
-2. **Add token to GitHub repository secrets**:
-   - Go to your GitHub repo
-   - Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `FLY_API_TOKEN`
-   - Value: (paste the token from step 1)
-   - Click "Add secret"
-
-3. **Create `.github/workflows/deploy.yml`**:
-   ```yaml
-   name: Deploy to Fly.io
-
-   on:
-     push:
-       branches:
-         - main
-
-   jobs:
-     deploy:
-       name: Deploy to Fly.io
-       runs-on: ubuntu-latest
-
-       steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
-
-         - name: Set up Fly.io CLI
-           uses: superfly/flyctl-actions/setup-flyctl@master
-
-         - name: Deploy to Fly.io
-           run: flyctl deploy --remote-only
-           env:
-             FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-   ```
-
-4. **Commit and push**:
-   ```bash
-   git add .github/workflows/deploy.yml
-   git commit -m "Add GitHub Actions CI/CD pipeline for Fly.io deployment"
-   git push origin main
-   ```
-
-5. **Watch the deployment**:
-   - Go to GitHub repo → Actions tab
-   - You'll see the workflow running
-   - Green checkmark = deployed successfully!
-
-**Optional enhancements** (add later):
-- Run tests before deployment
-- Deploy to staging environment first
-- Slack/Discord notifications on deployment
-- Deployment status badges in README
-
----
-
-### Phase 3: Monitoring & Optimization (Post-Deployment)
-
-**After deployment**:
-
-1. **Monitor costs** (weekly for first month):
-   - Fly.io dashboard → Usage/Cost Explorer
-   - Should stay at $0.00 with your traffic
-   - Rate limiter protects against LLM API overuse
-
-2. **Monitor rate limiter**:
-   - Check logs for "Rate limit exceeded" messages
-   - Adjust limit if needed (currently 30/day)
-
-3. **Set up basic monitoring**:
-   - Fly.io health checks (already configured)
-   - Optional: Add error tracking (Sentry free tier)
-   - Optional: Add analytics (Plausible, Simple Analytics)
+- **Hosting Provider**: Check your provider's dashboard (e.g., Render) for resource usage and cost estimates.
+- **Gemini API**: Monitor your usage in the Google AI Studio dashboard. The built-in rate limiter helps prevent unexpected costs.
 
 **Estimated monthly costs** (for portfolio/demo use):
-- **Fly.io**: **$0** (free tier includes: 3 shared-cpu-1x VMs @ 256MB RAM each - this app uses 1 VM @ 256MB)
+- **Hosting**: Many platforms like Render offer free tiers that are suitable for this application.
 - **Gemini API**: **$0** (free tier includes 15 requests/minute, 1,500 requests/day - our rate limiter caps at 30/day)
-- **Total**: **$0/month** for portfolio use 🎉
-
-> **Note**: With scale-to-zero configured, your app will:
-> - Stop when inactive (saves resources)
-> - Auto-start when someone visits (may take 3-5 seconds on first request)
-> - Perfect for portfolio/demo purposes!
+- **Total**: **$0/month** for portfolio use on a free tier.
 
 ---
 
 ### Quick Reference Commands
 
 ```bash
-# Fly.io deployment
-fly deploy                    # Deploy latest code
-fly logs                      # View logs
-fly status                    # Check app status
-fly open                      # Open app in browser
-fly ssh console               # SSH into container (debugging)
-fly apps destroy APP_NAME     # Delete app (stop all charges)
-
-# Cost monitoring
-fly apps list                 # See all apps
-# Then check Fly.io dashboard → Cost Explorer
-
 # Local development
 uvicorn backend.app.main:app --reload    # Run locally with hot reload
 docker compose up -d                      # Test Docker build locally

@@ -2,7 +2,7 @@
 Application configuration settings.
 
 Centralizes configurable values in one place for easy maintenance.
-Settings can be overridden via environment variables (.env file or Fly.io secrets).
+Settings can be overridden via environment variables.
 """
 
 import os
